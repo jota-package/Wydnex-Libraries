@@ -1,0 +1,18 @@
+{
+    "name": "jota-package/wydnex-libraries",
+    "description": "Libreria de fetalario",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Wydnex",
+            "email": "juan@wydnex.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Fedatario\\": "src/"
+        }
+    },
+    "require": {}
+}
