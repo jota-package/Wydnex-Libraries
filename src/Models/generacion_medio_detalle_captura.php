@@ -1,6 +1,6 @@
 <?php
 
-namespace Fedatario\Controllers;
+namespace Fedatario\Models;
 
 use function GuzzleHttp\Psr7\str;
 use Illuminate\Database\Eloquent\Model;

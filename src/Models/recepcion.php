@@ -1,6 +1,6 @@
 <?php
 
-namespace Fedatario\Controllers;
+namespace Fedatario\Models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;

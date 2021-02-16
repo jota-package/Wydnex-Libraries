@@ -1,6 +1,6 @@
 <?php
 
-namespace Fedatario\Controllers;
+namespace Fedatario\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Controllers\filesController;
