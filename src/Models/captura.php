@@ -20,7 +20,7 @@ Trait captura
     protected $table = 'captura';
 
 
-    protected $fillable = ['elemento_id'];
+    protected $fillable = ['proyecto_id','recepcion_id','cliente_id','captura_estado_glb','captura_estado','usuario_creador','usuario_asignado_indizacion','usuario_asignado_control_calidad','usuario_asignado_fed_revisar_asis','usuario_asignado_fed_revisar_nor','usuario_asignado_reproceso','tc_id','tc_descripcion','captura_orden','flujo_id_actual','captura_file_id'];
 
     public function recepcion()
     {
@@ -118,7 +118,7 @@ Trait captura
         $id_usuario_actual = session('usuario_id');
 
         foreach ($capturas as $cap) {
-
+            
             //viene por captura
             if (isset($cap['documento_id']) && isset($cap['adetalle_id'])) {
 
@@ -150,7 +150,7 @@ Trait captura
                 );
 
             } else {
-
+                
                 if (empty($cap["captura_file_id"])) {
                     // Creando la captura file
                     $file_created = filesController::create_captura([
@@ -170,8 +170,7 @@ Trait captura
 
 
                 // $captura_instancia = new App\captura();
-
-                $captura_instancia = $this::create([
+                $data = [
                     "proyecto_id" => $cap['proyecto_id'],
                     "recepcion_id" => $cap['recepcion_id'],
                     "cliente_id" => $cap['cliente_id'],
@@ -180,8 +179,10 @@ Trait captura
                     "captura_estado_glb" => 'cap',
                     "usuario_creador" => $id_usuario_actual,
                     "flujo_id_actual" => 1
-                ]);
+                ];
 
+                $captura_instancia = $this::create($data);
+                
                 $captura_id = $captura_instancia['captura_id'];
 
                 $log = new log();
