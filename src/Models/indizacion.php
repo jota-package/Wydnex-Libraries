@@ -3,6 +3,7 @@
 namespace Fedatario\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\User;
 use DB;
 
 Trait indizacion
@@ -13,19 +14,17 @@ Trait indizacion
     public function crear_indizacion($captura_id, $proyecto_id, $recepcion_id, $cliente_id, $indizacion_estado, $usuario_creador)
     {
 
-        $indizacion = new indizacion();
-        $indizacion->captura_id = $captura_id;
-        $indizacion->proyecto_id = $proyecto_id;
-        $indizacion->recepcion_id = $recepcion_id;
-        $indizacion->cliente_id = $cliente_id;
-        $indizacion->indizacion_estado = $indizacion_estado;
-        $indizacion->usuario_creador = $usuario_creador;
+        $this->captura_id = $captura_id;
+        $this->proyecto_id = $proyecto_id;
+        $this->recepcion_id = $recepcion_id;
+        $this->cliente_id = $cliente_id;
+        $this->indizacion_estado = $indizacion_estado;
+        $this->usuario_creador = $usuario_creador;
         // $respuesta->conca_id = $simple_tipo_formato;
 
-        $indizacion->save();
+        $save = $this->save();
 
-
-        return $indizacion;
+        return $save;
 
     }
 
@@ -36,9 +35,6 @@ Trait indizacion
 
     public function crear_indizacion_inicial_from_captura($captura_id, $usuario_creador)
     {
-        // DB::select( DB::raw("SELECT * FROM some_table WHERE some_col = :somevariable"), array(
-        //     'somevariable' => $someVariable,
-        //   ));
 
         return DB::select(
                     DB::raw("
@@ -112,7 +108,7 @@ Trait indizacion
     public function arbol_indizacion()
     {
 
-        $is_admin = user::is_admin();
+        $is_admin = User::is_admin();
         if($is_admin){
             return DB::select("
             select
@@ -161,19 +157,13 @@ Trait indizacion
     }
 
     public function estado_indizacion_glb($indizacion_id,$indizacion_estado_glb){
-
-        $is_indizacion = new indizacion();
-
-        $is_indizacion->where('indizacion_id', $indizacion_id)
+        $this->where('indizacion_id', $indizacion_id)
             ->update(['indizacion_estado' => $indizacion_estado_glb]);
-
-
 
     }
 
     public function estado_indizacion_glb_masivo($recepcion_id,$indizacion_estado_glb){
-        $is_indizacion = new indizacion();
-        $is_indizacion->where('recepcion_id', $recepcion_id)
+        $this->where('recepcion_id', $recepcion_id)
             ->where('indizacion_estado', 0)
             ->where('indizacion_tipo', 'VF')
             ->update(['indizacion_estado' => $indizacion_estado_glb]);

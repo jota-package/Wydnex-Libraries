@@ -5,7 +5,8 @@ namespace Fedatario\Models;
 use Illuminate\Database\Eloquent\Model;
 use DB;
 use DateTime;
-use App;
+use App\imagen;
+use App\captura;
 use Imagick;
 
 Trait incidencia_imagen
@@ -130,9 +131,7 @@ Trait incidencia_imagen
                 $last_pagina++;
             }
 
-            $incidencia_imagen = new App\incidencia_imagen();
-
-            $datos_incidencia = $incidencia_imagen
+            $datos_incidencia = $this
                 ->join('imagen', 'imagen.imagen_id', 'incidencia_imagen.imagen_id')
                 ->where('captura_id', '=', $captura_id)
                 ->first();
@@ -244,9 +243,7 @@ Trait incidencia_imagen
 
             }
 
-            $incidencia_imagen = new App\incidencia_imagen();
-
-            $datos_incidencia = $incidencia_imagen
+            $datos_incidencia = $this
                 ->join('imagen', 'imagen.imagen_id', 'incidencia_imagen.imagen_id')
                 ->where('captura_id', '=', $captura_id)
                 ->first();
@@ -326,9 +323,7 @@ Trait incidencia_imagen
             $imagen->created_at = $now;
             $imagen->updated_at = $now;
 
-            $incidencia_imagen = new App\incidencia_imagen();
-
-            $datos_incidencia = $incidencia_imagen
+            $datos_incidencia = $this
                 ->join('imagen', 'imagen.imagen_id', 'incidencia_imagen.imagen_id')
                 ->where('imagen.imagen_id', '=', $imagen_id)
                 ->first();
@@ -339,12 +334,12 @@ Trait incidencia_imagen
             $imagen->save();
             $imagenUpdate->save();
 
-            $incidencia_imagen->incidencia_id = $datos_incidencia->incidencia_id;
-            $incidencia_imagen->imagen_id = $imagen->imagen_id;
-            $incidencia_imagen->tipo_asociado = $datos_incidencia->tipo_asociado;
-            $incidencia_imagen->id_asociado = $datos_incidencia->id_asociado;
-            $incidencia_imagen->estado = 1;
-            $incidencia_imagen->save();
+            $this->incidencia_id = $datos_incidencia->incidencia_id;
+            $this->imagen_id = $imagen->imagen_id;
+            $this->tipo_asociado = $datos_incidencia->tipo_asociado;
+            $this->id_asociado = $datos_incidencia->id_asociado;
+            $this->estado = 1;
+            $this->save();
 
             DB::commit();
         } catch (\Exception $th) {
@@ -406,35 +401,6 @@ Trait incidencia_imagen
             throw $th;
         }
     }
-
-
-    public function demo()
-    {
-        $imagen = new imagen();
-        $imagen->recepcion_id = 2;
-        $imagen->captura_id = 3;
-        $imagen->documento_id = 3;
-        $imagen->imagen_nombre = "vvvvvvv";
-        $imagen->imagen_url = "trrrr";
-        $imagen->imagen_pagina = 1;
-        $imagen->imagen_estado = 1;
-        //   self::reemplazarImagen($imagen, 3);
-
-        $array[] = $imagen;
-        $imagen2 = new imagen();
-        $imagen2->recepcion_id = 2;
-        $imagen2->captura_id = 3;
-        $imagen2->documento_id = 3;
-        $imagen2->imagen_nombre = "777";
-        $imagen2->imagen_url = "565877";
-
-
-        $array[] = $imagen2;
-
-
-        return self::insertarImagenAntes($array, 2, 3, 3, 4);
-    }
-
 
     public function experimental(
         $arrayObjImagen,
@@ -528,8 +494,7 @@ Trait incidencia_imagen
     public function update_tabla_asociada($id_asociado, $tipo_asociado, $captura_id)
     {
 
-        $captura = new App\captura();
-
+        $captura = new captura();
 
         switch ($tipo_asociado) {
             case 'cap':

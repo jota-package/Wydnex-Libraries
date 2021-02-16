@@ -27,24 +27,22 @@ Trait log
         $log_archivo_id
     ){
 
-        $log = new log();
-        $log->log_fecha_hora = $log_fecha_hora;
-        $log->log_usuario = $log_usuario;
-        $log->log_estado = $log_estado;
-        $log->log_ip = $log_ip;
-        $log->log_captura_id = $log_captura_id;
-        $log->log_id_asociado = $log_id_asociado;
-        $log->log_modulo_step_id = $log_modulo_step_id;
-        $log->log_tabla_asociada = $log_tabla_asociada;
-        $log->log_proceso = $log_proceso;
-        $log->log_descripcion = $log_descripcion;
-        $log->log_comentario = $log_comentario;
-        $log->log_archivo_id = $log_archivo_id;
+        $this->log_fecha_hora = $log_fecha_hora;
+        $this->log_usuario = $log_usuario;
+        $this->log_estado = $log_estado;
+        $this->log_ip = $log_ip;
+        $this->log_captura_id = $log_captura_id;
+        $this->log_id_asociado = $log_id_asociado;
+        $this->log_modulo_step_id = $log_modulo_step_id;
+        $this->log_tabla_asociada = $log_tabla_asociada;
+        $this->log_proceso = $log_proceso;
+        $this->log_descripcion = $log_descripcion;
+        $this->log_comentario = $log_comentario;
+        $this->log_archivo_id = $log_archivo_id;
 
-        $log->save();
+        $save =  $this->save();
 
-
-        return $log;
+        return $save;
 
     }
 
@@ -59,25 +57,22 @@ Trait log
         $log_archivo_id = null
     ){
 
-        $log = new log();
-        $log->log_fecha_hora = date('Y-m-d H:i:s');
-        $log->log_usuario = session("usuario_id");
-        $log->log_estado = 1;
-        $log->log_ip = Request::ip();
-        $log->log_captura_id = $log_captura_id;
-        $log->log_id_asociado = $log_id_asociado;
-        $log->log_modulo_step_id = $log_modulo_step_id;
-        $log->log_tabla_asociada = $log_tabla_asociada;
-        $log->log_proceso = $log_proceso;
-        $log->log_descripcion = $log_descripcion;
-        $log->log_comentario = $log_comentario;
-        $log->log_archivo_id = $log_archivo_id;
+        $this->log_fecha_hora = date('Y-m-d H:i:s');
+        $this->log_usuario = session("usuario_id");
+        $this->log_estado = 1;
+        $this->log_ip = Request::ip();
+        $this->log_captura_id = $log_captura_id;
+        $this->log_id_asociado = $log_id_asociado;
+        $this->log_modulo_step_id = $log_modulo_step_id;
+        $this->log_tabla_asociada = $log_tabla_asociada;
+        $this->log_proceso = $log_proceso;
+        $this->log_descripcion = $log_descripcion;
+        $this->log_comentario = $log_comentario;
+        $this->log_archivo_id = $log_archivo_id;
 
-        $log->save();
+        $save = $this->save();
 
-
-        return $log;
-
+        return $save;
     }
 
     public function reporte_x_captura($captura_id){

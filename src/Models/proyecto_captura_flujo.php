@@ -13,8 +13,6 @@ Trait proyecto_captura_flujo
     public function crear_PCF_from_PF($captura_id)
     {
 
-        
-
         return DB::insert("
         insert into proyecto_captura_flujo
         (

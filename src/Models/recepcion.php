@@ -82,18 +82,15 @@ Trait recepcion
 
     public function crear_recepcion($cliente_id, $proyecto_id, $recepcion_estado,$recepcion_nombre)
     {
-
-        $recepcion = new recepcion();
-            $recepcion->cliente_id = $cliente_id;
-            $recepcion->proyecto_id = $proyecto_id;
-            $recepcion->recepcion_estado = $recepcion_estado;
-            $recepcion->recepcion_nombre = $recepcion_nombre;
-        $recepcion->save();
-
+        $this->cliente_id = $cliente_id;
+        $this->proyecto_id = $proyecto_id;
+        $this->recepcion_estado = $recepcion_estado;
+        $this->recepcion_nombre = $recepcion_nombre;
+        $recepcion= $this->save();
 
         return $recepcion;
-
     }
+
     public function validar_recepcion_existe($recepcion_nombre)
     {
         $recepcion = $this::where('recepcion_nombre', '=', $recepcion_nombre)->first();
