@@ -4,6 +4,7 @@ namespace Fedatario\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use DB;
+use App\User;
 
 Trait control_calidad
 {
@@ -77,7 +78,7 @@ Trait control_calidad
 
     public function arbol_controlcalidad()
     {
-        $is_admin = user::is_admin();
+        $is_admin = User::is_admin();
         if($is_admin){
             return DB::select("
             select

@@ -7,6 +7,8 @@ use DB;
 use App;
 use DateTime;
 use Request;
+use App\User;
+use App\archivo;
 
 Trait fedatario_firmar
 {
@@ -49,7 +51,7 @@ Trait fedatario_firmar
 
     public function arbol_fedatario_firmar()
     {
-        $is_admin = user::is_admin();
+        $is_admin = User::is_admin();
         if($is_admin){
             return DB::select("
                 select
@@ -399,7 +401,7 @@ Trait fedatario_firmar
         $array_files_firmados = [];
         foreach ($resultado as $key) {
 
-            $archivo = new App\archivo();
+            $archivo = new archivo();
             $archivo->proyecto_id = $key->proyecto_id;
             $archivo->save();
             $array_files = $key->files;

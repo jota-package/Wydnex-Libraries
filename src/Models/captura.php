@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use App\Http\Controllers\filesController;
 use App\Http\Controllers\respuesta;
 use DB;
+use App\documento;
+use App\incidencia_captura;
+use App\log;
+use App\proyecto_captura_flujo;
+use App\imagen;
+use App\recepcion;
+
 
 Trait captura
 {
@@ -73,21 +80,22 @@ Trait captura
         if ($validacion === 1) {
             // if ($validacion === 0) {
 
-            $captura = new captura();
-
-            $validacion2 = $captura::where('cliente_id', $cliente_id)
+            $validacion2 = $this::where('cliente_id', $cliente_id)
                 ->where('adetalle_id', $adetalle_id)
                 ->count();
 
 
             if ($validacion2 === 0) {
-                $captura->documento_id = $documento_id;
-                $captura->cliente_id = $cliente_id;
-                $captura->adetalle_id = $adetalle_id;
-                $captura->save();
-            }
+                $captura = $this::create([
+                    "documento_id" => $documento_id,
+                    "cliente_id" => $cliente_id,
+                    "adetalle_id" => $adetalle_id
+                ]);
 
-            return $captura;
+                return $captura;
+            }
+            
+            return "No valido.";
         } else {
             return "ya registrado";
         }
@@ -161,16 +169,18 @@ Trait captura
                 }
 
 
-                $captura_instancia = new captura();
-                $captura_instancia->proyecto_id = $cap['proyecto_id'];
-                $captura_instancia->recepcion_id = $cap['recepcion_id'];
-                $captura_instancia->cliente_id = $cap['cliente_id'];
-                $captura_instancia->captura_estado = $cap['captura_estado'];
-                $captura_instancia->captura_file_id = (!empty($cap['captura_file_id'])) ? $cap['captura_file_id'] : null;
-                $captura_instancia->captura_estado_glb = 'cap';
-                $captura_instancia->usuario_creador = $id_usuario_actual;
-                $captura_instancia->flujo_id_actual = 1;
-                $captura_save = $captura_instancia->save();
+                // $captura_instancia = new App\captura();
+
+                $captura_instancia = $this::create([
+                    "proyecto_id" => $cap['proyecto_id'],
+                    "recepcion_id" => $cap['recepcion_id'],
+                    "cliente_id" => $cap['cliente_id'],
+                    "captura_estado" => $cap['captura_estado'],
+                    "captura_file_id" => (!empty($cap['captura_file_id'])) ? $cap['captura_file_id'] : null,
+                    "captura_estado_glb" => 'cap',
+                    "usuario_creador" => $id_usuario_actual,
+                    "flujo_id_actual" => 1
+                ]);
 
                 $captura_id = $captura_instancia['captura_id'];
 
@@ -219,7 +229,7 @@ Trait captura
                 }
 
 
-                $obj_captura = $captura_instancia->where('captura_id', $captura_id)->first();
+                $obj_captura = $this->where('captura_id', $captura_id)->first();
                 $recepcion_id = $obj_captura->recepcion_id;
 
                 $recepcion_instancia = new recepcion();

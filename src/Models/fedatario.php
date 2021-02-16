@@ -133,7 +133,7 @@ Trait fedatario
                 where 
                 a.proyecto_id = proyecto_grupo.proyecto_id
                 and proyecto_grupo.proyecto_id = :proyecto_id
-                and proyecto_grupo.proyecto_grupo_tipo = :fedatario_tipo	
+                and proyecto_grupo.proyecto_grupo_tipo = :fedatario_tipo    
                 and proyecto_grupo.proyecto_grupo_nro = case when :fedatario_tipo = 'NORMAL' 
                                         then a.proyecto_grupo_fedatario_actual
                                         else a.proyecto_grupo_fedatario_asis_actual
@@ -160,16 +160,16 @@ Trait fedatario
                 from proyecto a
                 where a.proyecto_id = :proyecto_id
                 ),
-			--hacemos update al grupo del proyecto
-			update_proyecto as (
-				update proyecto 
-				set proyecto_grupo_fedatario_actual = 
-									case when :fedatario_tipo ='NORMAL' then proyecto_grupo_fedatario_actual+1 
-										 else proyecto_grupo_fedatario_actual end ,
-					proyecto_grupo_fedatario_asis_actual = 
-									case when :fedatario_tipo ='ASISTENTE' then proyecto_grupo_fedatario_asis_actual+1 
-										 else proyecto_grupo_fedatario_asis_actual end
-				where proyecto_id = :proyecto_id
+            --hacemos update al grupo del proyecto
+            update_proyecto as (
+                update proyecto 
+                set proyecto_grupo_fedatario_actual = 
+                                    case when :fedatario_tipo ='NORMAL' then proyecto_grupo_fedatario_actual+1 
+                                         else proyecto_grupo_fedatario_actual end ,
+                    proyecto_grupo_fedatario_asis_actual = 
+                                    case when :fedatario_tipo ='ASISTENTE' then proyecto_grupo_fedatario_asis_actual+1 
+                                         else proyecto_grupo_fedatario_asis_actual end
+                where proyecto_id = :proyecto_id
             ),
             --insertamos el log tomando como from where lo mismo del primer query
             --no hay problema con que se hayan hecho update a las tablas por que 
@@ -216,7 +216,7 @@ Trait fedatario
             )
             --select final con el orden que requiere el arbol
             select * from data_previa_sin_orden a
-            order by a.proyecto_id, a.recepcion_id, a.captura_id, a.indizacion_id	
+            order by a.proyecto_id, a.recepcion_id, a.captura_id, a.indizacion_id   
             ", ["porcentaje"=>$porcentaje,"proyecto_id"=>$proyecto_id,"fedatario_tipo"=>$fedatario_tipo
             ,"usuario_id"=>$usuario_id,"ip"=>$ip]);
     }
