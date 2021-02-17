@@ -36,7 +36,7 @@ Trait generacionmedios_organizarController
     public function proyecto_ver_recepcion(Request $request)
     {
 
-        $proyecto_id = request("proyecto_id");
+        $proyecto_id = $request->input("proyecto_id",0);
 
         $recepcion_x_proyecto = DB::select("select
                                                 distinct on (b.recepcion_id) b.recepcion_id,
@@ -54,7 +54,7 @@ Trait generacionmedios_organizarController
 
     }
 
-    public function proyecto_ver_gm(Request $request)
+    public function proyecto_ver_gm(Request $requestx)
     {
 
         $recepcion_id = request("recepcion_id");
