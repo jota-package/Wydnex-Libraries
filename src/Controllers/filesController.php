@@ -8,6 +8,9 @@ use App\Http\Controllers\dangoController;
 use Carbon\Carbon;
 use App;
 
+use App\files;
+use App\User;
+use App\proyecto;
 
 class filesController extends Controller
 {
@@ -20,7 +23,7 @@ class filesController extends Controller
 			"file_tipo" => 2,
 			"file_usuario_id" => 1
 		];
-		$f = new App\files();
+		$f = new files();
 		//return $f->crear($data);
 		//return $f->listar_desde_recepcion(1, 2);
 		//return $f->mover(1, 2);
@@ -34,7 +37,7 @@ class filesController extends Controller
 		//return respuesta::ok(["file_id" => 15]);
 
 		// Considerado que unicamente los nodos que se crean por este controlador son los nodos de tipo directorio
-		$f = new App\files();
+		$f = new files();
 		$parent = $request->input('padre_id', 0);
 		if($parent == 0){
 			$data = [
@@ -46,7 +49,7 @@ class filesController extends Controller
 			];
 			return $f->crear($data);
 		} else {
-			$parent = App\files::where('file_id', $parent)
+			$parent = files::where('file_id', $parent)
 						->where('recepcion_id', intval($request->input('recepcion_id',0)))
 						->where('file_captura_estado', intval($request->input('captura_estado',0)))
 						->first();
@@ -76,7 +79,7 @@ class filesController extends Controller
 	*/
 	public static function create_captura($data, $nombre=""){
 		// 3.2 Creando la captura file
-        $f = new App\files();
+        $f = new files();
         $parent = intval((!empty($data["padre_id"]))?$data["padre_id"] : 0);
         if($parent == 0){
             $file_created = $f->crear([
@@ -88,7 +91,7 @@ class filesController extends Controller
             ]);
         } else {
 
-            $parent = App\files::where('file_id', $parent)
+            $parent = files::where('file_id', $parent)
                         ->where('recepcion_id', intval((!empty($data["recepcion_id"]))? $data["recepcion_id"] : 0))
                         ->where('file_captura_estado', intval((!empty($data["captura_estado"]))? $data["captura_estado"] : 0))
                         ->first();
@@ -120,7 +123,7 @@ class filesController extends Controller
 		// Descomentar la siguiente linea en caso de test rapido para front-end
 		// return respuesta::ok($request->all());
 
-		$f = new App\files();
+		$f = new files();
 		return $f->renombrar($request->input('file_id',0),$request->input('nombre',''));
 	}
 
@@ -128,12 +131,12 @@ class filesController extends Controller
 		// Descomentar la siguiente linea en caso de test rapido para front-end
 		// return respuesta::ok($request->all());
 		//return respuesta::error("No se pudo renombrar pa pa.",500);
-		$f = new App\files();
+		$f = new files();
 		return $f->borrar_directorio($request->input('file_id',0));
 	}
 
 	public function move_node(Request $request){
-		$f = new App\files();
+		$f = new files();
 		$file_id = intval($request->input('file_id', 0));
 		$padre_id = intval($request->input('new_padre_id', 0));
 		$recepcion_id = intval($request->input('recepcion_id', 0));
@@ -185,7 +188,7 @@ class filesController extends Controller
     }
 
 	public function load_node($recepcion_id, $file_id, $captura_estado){
-		$f = new App\files();
+		$f = new files();
 		if($file_id == 0){
 			$lista = $f->listar_desde_recepcion($recepcion_id, $captura_estado);
 		} else {
@@ -258,7 +261,7 @@ class filesController extends Controller
 	}
 
     public function load_node_admin($recepcion_id, $file_id, $captura_estado){
-        $f = new App\files();
+        $f = new files();
         if($file_id == 0){
             $lista = $f->listar_todo_desde_recepcion_admin($recepcion_id, $captura_estado);
         } else {
@@ -332,7 +335,7 @@ class filesController extends Controller
 
 
     public function load_node_documento($recepcion_id, $file_id, $captura_estado){
-        $f = new App\files();
+        $f = new files();
         if($file_id == 0){
             $lista = $f->listar_todo_desde_recepcion_documento($recepcion_id, $captura_estado);
         } else {
@@ -440,7 +443,7 @@ class filesController extends Controller
 		$file_id = $request->input('file_id',0);
 		$captura_estado = $request->input('captura_estado',0);
 
-		$f = new App\files();
+		$f = new files();
 		if($file_id == 0){
 			$lista = $f->listar_todo_desde_recepcion($recepcion_id, $captura_estado);
 		} else {
@@ -468,7 +471,7 @@ class filesController extends Controller
         $file_id = $request->input('file_id',0);
         $captura_estado = $request->input('captura_estado',0);
 
-        $f = new App\files();
+        $f = new files();
         if($file_id == 0){
             $lista = $f->listar_todo_desde_recepcion_admin($recepcion_id, $captura_estado);
         } else {
@@ -495,7 +498,7 @@ class filesController extends Controller
         $file_id = $request->input('file_id',0);
         $captura_estado = $request->input('captura_estado',0);
 
-        $f = new App\files();
+        $f = new files();
         if($file_id == 0){
             $lista = $f->listar_todo_desde_recepcion_documento($recepcion_id, $captura_estado);
         } else {
@@ -519,10 +522,10 @@ class filesController extends Controller
 
 	public function load_main_tree(){
 
-	    $is_admin = App\user::is_admin();
+	    $is_admin = User::is_admin();
 
 	    if($is_admin){
-            $data = App\proyecto::
+            $data = proyecto::
             select(
                 "proyecto_id",
                 "proyecto_nombre as text"
@@ -533,7 +536,7 @@ class filesController extends Controller
                 ->get();
         }else{
             $usuario_id = session('usuario_id');
-            $data = App\proyecto::
+            $data = proyecto::
             select(
                 "proyecto.proyecto_id",
                 "proyecto.proyecto_nombre as text",
@@ -551,7 +554,7 @@ class filesController extends Controller
 	}
 
     public function load_main_tree_admin(){
-        $data = App\proyecto::
+        $data = proyecto::
         select(
             "proyecto_nombre as text",
             "proyecto_id"
@@ -564,7 +567,7 @@ class filesController extends Controller
     }
 
     public function load_main_tree_documento(){
-        $data = App\proyecto::
+        $data = proyecto::
         select(
             "proyecto_nombre as text",
             "proyecto_id"

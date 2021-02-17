@@ -7,6 +7,13 @@ use View;
 use App;
 use DB;
 
+use App\proyecto;
+use App\medio_exportacion;
+use App\generacion_medio_recepcion;
+use App\generacion_medio_detalle;
+use App\generacion_medio;
+use App\generacion_medio_detalle_captura;
+
 class generacionmedios_organizarController extends Controller
 {
     public function __construct()
@@ -19,10 +26,10 @@ class generacionmedios_organizarController extends Controller
 
     public function index()
     {
-        $is_proyecto = new App\proyecto();
+        $is_proyecto = new proyecto();
         $proyectos = $is_proyecto->proyecto_usuario();
 
-        $is_me = new App\medio_exportacion();
+        $is_me = new medio_exportacion();
         $medios_generados = $is_me
             ->select("me_id", "me_descripcion", "me_capacidad")
             ->get();
@@ -59,14 +66,14 @@ class generacionmedios_organizarController extends Controller
 
         $recepcion_id = request("recepcion_id");
 
-        $is_gmr = new App\generacion_medio_recepcion();
+        $is_gmr = new generacion_medio_recepcion();
         $gm_componentes = $is_gmr->join('generacion_medio as gm', 'gm.gm_id', 'generacion_medio_recepcion.gm_id')
             ->select('gm_prefijo', 'gm_correlativo', 'me_id', 'gm_peso_otros')
             ->where('generacion_medio_recepcion.recepcion_id', $recepcion_id)
             ->first();
 
 
-        $is_gmd = new App\generacion_medio_detalle();
+        $is_gmd = new generacion_medio_detalle();
         $gm_detalle = $is_gmd->join('generacion_medio as gm', 'gm.gm_id', 'generacion_medio_detalle.gm_id')
             ->join('generacion_medio_recepcion as gmr', 'gmr.gm_id', 'gm.gm_id')
             ->select('generacion_medio_detalle.gmd_id', 'gmr.gm_id', 'generacion_medio_detalle.gmd_nombre', 'generacion_medio_detalle.gmd_peso_maximo', 'generacion_medio_detalle.gmd_peso_ocupado', 'generacion_medio_detalle.gmd_total_documento', 'generacion_medio_detalle.gmd_grupo', 'generacion_medio_detalle.gmd_estado')
@@ -127,7 +134,7 @@ class generacionmedios_organizarController extends Controller
 
         $size = request("size");
 
-        $is_me = new App\medio_exportacion();
+        $is_me = new medio_exportacion();
 
         if ($medio_id == 6) {
 
@@ -143,7 +150,7 @@ class generacionmedios_organizarController extends Controller
 
         $me_exportacion_datos = $is_me->select('me_id', 'me_capacidad')->where('me_id', $medio_id)->first();
         $me_capacidad_double = ($me_exportacion_datos['me_capacidad']) / 1000000;
-        $is_gm = new App\generacion_medio();
+        $is_gm = new generacion_medio();
 
         $validacion = $is_gm->validacion($nombre, $correlativo, $me_capacidad_double, $recepciones, $medio_id,$espacio_libre,$gm_id);
         if(count($validacion)>0){
@@ -224,7 +231,7 @@ class generacionmedios_organizarController extends Controller
 
         $gm_id = request("gm_id");
 
-        $is_gmd = new App\generacion_medio();
+        $is_gmd = new generacion_medio();
         $array_cabecera = $is_gmd->consulta_cabecera($gm_id);
         $gm_detalle = $is_gmd->consulta($gm_id);
         //return $array_cabecera;
@@ -242,8 +249,8 @@ class generacionmedios_organizarController extends Controller
 
         $array_gmd = request("array_check");
 
-        $gmd = new App\generacion_medio_detalle();
-        $gmdc = new App\generacion_medio_detalle_captura();
+        $gmd = new generacion_medio_detalle();
+        $gmdc = new generacion_medio_detalle_captura();
 
         foreach ($array_gmd as $gmd_id){
 

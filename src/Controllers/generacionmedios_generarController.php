@@ -8,6 +8,17 @@ use View;
 use App;
 use Illuminate\Support\Facades\DB;
 
+use App\proyecto;
+use App\Http\Controllers\tipo_calibradorController;
+use App\medio_exportacion;
+use App\generacion_medio;
+use App\files;
+use App\generacion_medio_detalle_captura;
+use App\generacion_medio_detalle;
+use App\recepcion;
+
+
+
 class generacionmedios_generarController extends Controller
 {
     public function __construct()
@@ -21,12 +32,12 @@ class generacionmedios_generarController extends Controller
     public function index()
     {
 
-        $is_proyecto = new App\proyecto();
+        $is_proyecto = new proyecto();
         $proyectos = $is_proyecto->proyecto_usuario();
 
-        $ins_tipo_calibrador = new App\Http\Controllers\tipo_calibradorController();
+        $ins_tipo_calibrador = new tipo_calibradorController();
 
-        $is_me = new App\medio_exportacion();
+        $is_me = new medio_exportacion();
         $medios_generados = $is_me
             ->select("me_id", "me_descripcion", "me_capacidad")
             ->get();
@@ -43,12 +54,12 @@ class generacionmedios_generarController extends Controller
     public function index_personalizado()
     {
 
-        $is_proyecto = new App\proyecto();
+        $is_proyecto = new proyecto();
         $proyectos = $is_proyecto->select('proyecto_id', 'proyecto_nombre')->get();
 
-        $ins_tipo_calibrador = new App\Http\Controllers\tipo_calibradorController();
+        $ins_tipo_calibrador = new tipo_calibradorController();
 
-        $is_me = new App\medio_exportacion();
+        $is_me = new medio_exportacion();
         $medios_generados = $is_me
             ->select("me_id", "me_descripcion", "me_capacidad")
             ->get();
@@ -167,10 +178,10 @@ class generacionmedios_generarController extends Controller
         $correlativo = request("correlativo");
         $medio_id = request("medio_id");
 
-        $is_me = new App\medio_exportacion();
+        $is_me = new medio_exportacion();
         $peso_maximo = $is_me->select('me_capacidad')->where('me_id', $medio_id)->first();
 
-        $is_gm = new App\generacion_medio();
+        $is_gm = new generacion_medio();
             $gm_data = $is_gm->organizar($nombre, $correlativo, $peso_maximo['me_capacidad'], $array_check);
 
         return $gm_data;
@@ -185,7 +196,7 @@ class generacionmedios_generarController extends Controller
         // definir
         //$gmd_id = 103;
 
-        $modelo_gm = new App\generacion_medio();
+        $modelo_gm = new generacion_medio();
 
         $array_recepciones = $modelo_gm->recepciones_x_gmd($gmd_id);
         $ids = [];
@@ -201,7 +212,7 @@ class generacionmedios_generarController extends Controller
         //$nombre_file = ($gmd_id."_main.json");
         //$nombre_file_hijo = ($gmd_id."_recepcion_");
 
-        $modelo_file = new App\files();
+        $modelo_file = new files();
 
         //$array = $modelo_file->prueba_arbol($ids, $ruta_salida, $nombre_file_hijo);
 
@@ -231,7 +242,7 @@ class generacionmedios_generarController extends Controller
 
         $contador_error = 0;
 
-        $is_gm = new App\generacion_medio();
+        $is_gm = new generacion_medio();
         $path = storage_path() . "/app/documentos/";
         $path_documentos = "documentos/";
 
@@ -240,7 +251,7 @@ class generacionmedios_generarController extends Controller
 
         foreach ($array_check as $gmd_id) {
 
-            $is_capturas = new App\generacion_medio_detalle_captura();
+            $is_capturas = new generacion_medio_detalle_captura();
 
             $contador_gmd = $is_capturas->validador_captura_listar_ac($gmd_id, 5);
 
@@ -394,12 +405,12 @@ class generacionmedios_generarController extends Controller
 
         $gm_id = request("gm_id");
 
-        $is_gm = new App\generacion_medio();
+        $is_gm = new generacion_medio();
         $gm_componentes = $is_gm->select('gm_prefijo', 'gm_correlativo', 'me_id', 'gm_peso_otros')
             ->where('gm_id', $gm_id)
             ->first();
 
-        $is_gmd = new App\generacion_medio_detalle();
+        $is_gmd = new generacion_medio_detalle();
         $gm_detalle = $is_gmd->select('gmd_id', 'gm_id', 'gmd_nombre', 'gmd_peso_maximo', 'gmd_peso_ocupado', 'gmd_total_documento', 'gmd_grupo', 'gmd_estado')
             ->where('gm_id', $gm_id)
             ->get();
@@ -439,7 +450,7 @@ class generacionmedios_generarController extends Controller
 
         $gmd_id = request("gmd_id");
 
-        $is_capturas = new App\generacion_medio_detalle_captura();
+        $is_capturas = new generacion_medio_detalle_captura();
         $modal_gmd = $is_capturas->captura_listar_acta_cierre($gmd_id);
 
         return $modal_gmd;
@@ -451,7 +462,7 @@ class generacionmedios_generarController extends Controller
 
         $gmd_id = request("gmd_id");
 
-        $is_capturas = new App\generacion_medio_detalle_captura();
+        $is_capturas = new generacion_medio_detalle_captura();
         $contador_gmd = $is_capturas->validador_captura_listar_ac($gmd_id, 4);
 
         if (count($contador_gmd) == 0) {
@@ -478,7 +489,7 @@ class generacionmedios_generarController extends Controller
     {
         $root = storage_path() . "/app/";
         $path_base = "documentos";
-        $info = App\recepcion::where('recepcion_id', $recepcion_id)
+        $info = recepcion::where('recepcion_id', $recepcion_id)
             ->join("proyecto as p", "p.proyecto_id", "recepcion.proyecto_id")
             ->first();
         if (isset($info["proyecto_nombre"]) && isset($info["recepcion_nombre"])) {
@@ -499,7 +510,7 @@ class generacionmedios_generarController extends Controller
 
     public function podergreen_cont(){
 
-        $modelo_file = new App\files();
+        $modelo_file = new files();
         $path = storage_path() . "/app/documentos/";
 
         return $modelo_file->podergreen('21',$path);
@@ -508,7 +519,7 @@ class generacionmedios_generarController extends Controller
 
     public function podergreenv2_cont(){
 
-        $modelo_file = new App\files();
+        $modelo_file = new files();
         $path = storage_path() . "/app/documentos/";
 
         return $modelo_file->podergreenv2('21','41','36',$path);

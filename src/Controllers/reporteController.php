@@ -7,6 +7,14 @@ use App;
 use View;
 use DB;
 use Response;
+use App\proyecto;
+use App\recepcion;
+use App\cliente;
+use App\equipo;
+use App\documento;
+use App\log;
+use App\Http\Controllers\incidenciaController;
+use App\Http\Controllers\tipo_calibradorController;
 
 class reporteController extends Controller
 {
@@ -21,20 +29,20 @@ class reporteController extends Controller
 
     public function index_user_proceso(){
 
-        $is_proyecto = new App\proyecto();
+        $is_proyecto = new proyecto();
         $proyectos = $is_proyecto->select('proyecto_id', 'proyecto_nombre')->get();
 
-        $equipo = App\equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
+        $equipo = equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
             ->select('p.persona_nombre','p.persona_apellido','equipo.usuario_id')
             ->distinct()
             ->get();
 
-        $is_recepcion = new App\recepcion();
+        $is_recepcion = new recepcion();
         $recepcion = $is_recepcion->select('recepcion_id', 'recepcion_nombre')
             ->distinct()
             ->get();
 
-        $is_cliente = new App\cliente();
+        $is_cliente = new cliente();
         $cliente = $is_cliente->select('cliente_id', 'cliente_nombre')
             ->distinct()
             ->get();
@@ -336,10 +344,10 @@ class reporteController extends Controller
     public function index_documento(){
 
         //Instancia Documento
-        $ins_documento = new App\documento();
+        $ins_documento = new documento();
         //Instancia Incidencia
-        $ins_incidencia = new App\Http\Controllers\incidenciaController();
-        $ins_tipo_calibrador = new App\Http\Controllers\tipo_calibradorController();
+        $ins_incidencia = new incidenciaController();
+        $ins_tipo_calibrador = new tipo_calibradorController();
 
         $lista_documentos = $ins_documento->listar_documento();
         $incidencia = $ins_incidencia->listar_incidencia();
@@ -354,20 +362,20 @@ class reporteController extends Controller
 
     public function index_user(){
 
-        $is_proyecto = new App\proyecto();
+        $is_proyecto = new proyecto();
         $proyectos = $is_proyecto->select('proyecto_id', 'proyecto_nombre')->get();
 
-        $equipo = App\equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
+        $equipo = equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
             ->select('p.persona_nombre','p.persona_apellido','equipo.usuario_id')
             ->distinct()
             ->get();
 
-        $is_recepcion = new App\recepcion();
+        $is_recepcion = new recepcion();
         $recepcion = $is_recepcion->select('recepcion_id', 'recepcion_nombre')
             ->distinct()
             ->get();
 
-        $is_cliente = new App\cliente();
+        $is_cliente = new cliente();
         $cliente = $is_cliente->select('cliente_id', 'cliente_nombre')
             ->distinct()
             ->get();
@@ -383,7 +391,7 @@ class reporteController extends Controller
     public function resultado_modulo_reporte(){
 
         $captura_id = request('captura_id');
-        $is_log = new App\log();
+        $is_log = new log();
         $log = $is_log -> reporte_x_captura($captura_id);
 
         return $log;
@@ -391,7 +399,7 @@ class reporteController extends Controller
 
     public function index_formato_proceso(){
 
-        $is_cliente = new App\cliente();
+        $is_cliente = new cliente();
         $cliente = $is_cliente->select('cliente_id', 'cliente_nombre')
             ->distinct()
             ->get();
@@ -924,7 +932,7 @@ class reporteController extends Controller
         $cliente_id = request('cliente_id');
         $arr_cliente_id = "{".implode(",",$cliente_id)."}";
 
-        $is_recepcion = new App\cliente();
+        $is_recepcion = new cliente();
         $proyecto_x_cliente = $is_recepcion -> cliente_x_recepcion($arr_cliente_id);
 
         if (count($proyecto_x_cliente) > 0) {
@@ -943,7 +951,7 @@ class reporteController extends Controller
         $proyecto_id = request('proyecto_id');
         $arr_proyecto_id = "{".implode(",",$proyecto_id)."}";
 
-        $is_recepcion = new App\recepcion();
+        $is_recepcion = new recepcion();
         $recepcion_x_proyecto = $is_recepcion -> recepcion_x_proyecto($arr_proyecto_id);
 
         if (count($recepcion_x_proyecto) > 0) {
@@ -962,7 +970,7 @@ class reporteController extends Controller
         $proyecto_id = request('proyecto_id');
         $arr_proyecto_id = "{".implode(",",$proyecto_id)."}";
 
-        $is_proyecto = new App\proyecto();
+        $is_proyecto = new proyecto();
         $usuario_x_proyecto = $is_proyecto -> usuario_x_proyecto($arr_proyecto_id);
 
         if (count($usuario_x_proyecto) > 0) {
