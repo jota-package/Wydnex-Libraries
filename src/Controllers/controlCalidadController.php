@@ -3,6 +3,14 @@
 namespace Fedatario\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\incidenciaController;
+use App\proyecto;
+use App\captura;
+use App\proyecto_captura_flujo;
+use App\control_calidad;
+use App\log;
+use App\incidencia_control_calidad;
+use App\fedatario;
 use App;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +30,7 @@ Trait controlCalidadController
     {
 
         //Instancia Incidencia
-        $ins_incidencia = new App\Http\Controllers\incidenciaController();
+        $ins_incidencia = new incidenciaController();
         $incidencia = $ins_incidencia->listar_incidencia();
 
         return view::make('controlCalidad.index.content')
@@ -32,8 +40,7 @@ Trait controlCalidadController
     public function listar_arbol_control()
     {
 
-
-        $data = App\proyecto::
+        $data = proyecto::
         select(
             "proyecto_nombre as text",
             "proyecto_id"
@@ -43,16 +50,12 @@ Trait controlCalidadController
             // ->where("cliente_id",1)
             ->get();
 
-
-        // return $data;
         return self::verifyDirectoryTreeCliente($data);
 
     }
 
     public function verifyDirectoryTreeCliente($client, $demo = 0)
     {
-
-        ////
 
         $prefijo_id = "captura_";
 
@@ -128,7 +131,7 @@ Trait controlCalidadController
         $usuario_id = session('usuario_id');
 
 
-        $cant = App\captura::where('captura_id', $captura_id)
+        $cant = captura::where('captura_id', $captura_id)
             ->whereNotNull('usuario_asignado_control_calidad')
             ->Where('usuario_asignado_control_calidad', '!=', $usuario_id)
             ->count();
@@ -141,7 +144,7 @@ Trait controlCalidadController
         }
 
 
-        $captura = App\captura::where('captura_id', $captura_id)
+        $captura = captura::where('captura_id', $captura_id)
             ->update(['usuario_asignado_control_calidad' => $usuario_id
             ]);
 
@@ -428,7 +431,7 @@ Trait controlCalidadController
 
         $usuario_creador = 1;
 
-        $control_calidad = new App\control_calidad();
+        $control_calidad = new control_calidad();
         $control_calidad->cliente_id = $cliente_id;
         $control_calidad->proyecto_id = $proyecto_id;
         $control_calidad->recepcion_id = $recepcion_id;
@@ -441,7 +444,7 @@ Trait controlCalidadController
 
         $cc_id = $control_calidad->cc_id;
 
-        $incidencia_cc = new App\incidencia_control_calidad();
+        $incidencia_cc = new incidencia_control_calidad();
         $incidencia_cc->incidencia_id = $incidencia_id;
         $incidencia_cc->cc_id = $cc_id;
         $incidencia_cc->save();
@@ -497,7 +500,7 @@ Trait controlCalidadController
     public function arbol_controlcalidad()
     {
 
-        $data = (new App\control_calidad())->arbol_controlcalidad();
+        $data = (new control_calidad())->arbol_controlcalidad();
 
         $array_proyecto = array();
         $array_recepcion = array();
@@ -580,7 +583,7 @@ Trait controlCalidadController
 
 
         //Enviado a la funcion global de incidencia
-        $obj = (new App\Http\Controllers\incidenciaController())->finalizar_registro_incidencia_glb($id_asociado, $usuario_creador, $tipo_asociado,
+        $obj = (new incidenciaController())->finalizar_registro_incidencia_glb($id_asociado, $usuario_creador, $tipo_asociado,
             function ($id_asociado, $usuario_creador, $count, $request) {
 
                 $cap_est_glb_0 = 'rep';
@@ -595,11 +598,11 @@ Trait controlCalidadController
 
                 if ($count > 0) {
                     //mandar captura a estado reproceso id_asociado = cc_id
-                    $cc_update = (new App\control_calidad())->update_estado_cc($id_asociado, 1);
+                    $cc_update = (new control_calidad())->update_estado_cc($id_asociado, 1);
                     $this->estado_captura_glb($captura_id, $cap_est_glb_0);
 
                     //grabamos log de captura
-                    $log = new App\log();
+                    $log = new log();
                     $log->create_log_ez(
                                 $captura_id,//$log_captura_id  ,
                                 $id_asociado,//$log_id_asociado  ,
@@ -613,14 +616,14 @@ Trait controlCalidadController
 
                 } else {
 
-                    $cc_update = (new App\control_calidad())->update_estado_cc($id_asociado, 2);
+                    $cc_update = (new control_calidad())->update_estado_cc($id_asociado, 2);
                     //(new App\fedatario())->crear_fedatario_inicial_from_cc($captura_id,$usuario_creador,$recepcion_id,$cc_id,$proyecto_id,$indizacion_id,$cliente_id);
                     $this->registrar_avance_flujo_from_cc_to($captura_id, $usuario_creador);
                     $this->estado_captura_glb($captura_id, $cap_est_glb_1);
                     // Actualizar control de calidad
 
                     //grabamos log de captura
-                    $log = new App\log();
+                    $log = new log();
                     $log->create_log_ez(
                                 $captura_id,//$log_captura_id  ,
                                 $id_asociado,//$log_id_asociado  ,
@@ -634,7 +637,7 @@ Trait controlCalidadController
 
 
                 }
-                return (new App\Http\Controllers\controlCalidadController())
+                return $this()
                     ->retorna_autoasignacion_nueva_captura($proyecto_id, $recepcion_id, $captura_id, $usuario_creador);
 
             });
@@ -687,7 +690,7 @@ Trait controlCalidadController
         // $this->estado_captura_glb_masivo($recepcion_id, $cap_est_glb_1);
 
         //falta los cambios por el flujo dinámico
-        $pro_cap_flujo = (new App\proyecto_captura_flujo())->consultar_orden($consultar_orden_recepcion);
+        $pro_cap_flujo = (new proyecto_captura_flujo())->consultar_orden($consultar_orden_recepcion);
         $modulo_step_id = 0;
         if (count($pro_cap_flujo) > 0) {
             $modulo_step_id = $pro_cap_flujo[0]->modulo_step_id;
@@ -696,8 +699,8 @@ Trait controlCalidadController
             switch ($modulo_step_id) {
                 case 4:
                     //pasa a fedatario revisar
-                    (new App\fedatario())->crear_fedatario_inicial_from_captura_masivo($usuario_creador, $recepcion_id);
-                    (new App\control_calidad())->update_estado_cc_masivo($recepcion_id, $control_calidad_estado_finalizado);
+                    (new fedatario())->crear_fedatario_inicial_from_captura_masivo($usuario_creador, $recepcion_id);
+                    (new control_calidad())->update_estado_cc_masivo($recepcion_id, $control_calidad_estado_finalizado);
                     $this->estado_captura_glb_masivo($recepcion_id, $cap_est_glb_1);
                     //$id_generado_nuevo_modulo = (new App\fedatario())->crear_fedatario_inicial_from_captura($captura_id, $usuario_creador);
                     break;
@@ -730,7 +733,7 @@ Trait controlCalidadController
      */
     function registrar_avance_flujo_from_cc_to($captura_id, $usuario_creador)
     {
-        $pro_cap_flujo = (new App\proyecto_captura_flujo())->consultar_orden($captura_id);
+        $pro_cap_flujo = (new proyecto_captura_flujo())->consultar_orden($captura_id);
         $modulo_step_id = 0;
         if (count($pro_cap_flujo) > 0) {
             $modulo_step_id = $pro_cap_flujo[0]->modulo_step_id;
@@ -739,7 +742,7 @@ Trait controlCalidadController
             switch ($modulo_step_id) {
                 case 4:
                     //pasa a fedatario revisar
-                    $id_generado_nuevo_modulo = (new App\fedatario())->crear_fedatario_inicial_from_captura($captura_id, $usuario_creador);
+                    $id_generado_nuevo_modulo = (new fedatario())->crear_fedatario_inicial_from_captura($captura_id, $usuario_creador);
                     break;
                 case 5:
                     //pasa a fedatario firmar

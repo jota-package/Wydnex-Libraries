@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\proyecto;
+use App\indizacion;
+use App\captura;
+use App\fedatario;
+use App\log;
+use App\Http\Controllers\incidenciaController;
 use App;
 use View;
 use DB;
@@ -21,11 +27,11 @@ class fedatario_asistenteController extends Controller
     public function index()
     {
 
-        $is_proyecto = new App\proyecto();
+        $is_proyecto = new proyecto();
         $lista_proyecto = $is_proyecto->proyecto_usuario_asistente();
 
         //Instancia Incidencia
-        $ins_incidencia = new App\Http\Controllers\incidenciaController();
+        $ins_incidencia = new incidenciaController();
         $incidencia = $ins_incidencia->listar_incidencia();
 
         return view::make('fedatario_asistente.index.content')
@@ -40,14 +46,14 @@ class fedatario_asistenteController extends Controller
         $plantilla_id = request("plantilla_id");
         $captura_id = request("captura_id");
 
-        $indizacion = (new App\indizacion())->where('captura_id',$captura_id)->first();
+        $indizacion = (new indizacion())->where('captura_id',$captura_id)->first();
         $indizacion_id = $indizacion['indizacion_id'];
 
         //validacion de autoasignacion
         $usuario_id = session('usuario_id');
 
 
-        $cant = App\captura::where('captura_id', $captura_id)
+        $cant = captura::where('captura_id', $captura_id)
             ->whereNotNull('usuario_asignado_fed_revisar_asis')
             ->Where('usuario_asignado_fed_revisar_asis', '!=', $usuario_id)
             ->count();
@@ -60,7 +66,7 @@ class fedatario_asistenteController extends Controller
         }
 
 
-        $captura = App\captura::where('captura_id', $captura_id)
+        $captura = captura::where('captura_id', $captura_id)
             ->update(['usuario_asignado_fed_revisar_asis' => $usuario_id
             ]);
 
@@ -342,8 +348,8 @@ class fedatario_asistenteController extends Controller
         $proyecto_id = request('proyecto_id');
         $usuario_creador = session("usuario_id");
 
-        $validacion = (new App\fedatario())->validacion_update_grupo_antiguo($proyecto_id,1);
-        $data = (new App\fedatario())->arbol_fedatario($porcentaje,$proyecto_id,1);
+        $validacion = (new fedatario())->validacion_update_grupo_antiguo($proyecto_id,1);
+        $data = (new fedatario())->arbol_fedatario($porcentaje,$proyecto_id,1);
 
         $array_proyecto = array();
         $array_recepcion = array();
@@ -428,7 +434,7 @@ class fedatario_asistenteController extends Controller
 
 
         //Enviado a la funcion global de incidencia
-        $obj = (new App\Http\Controllers\incidenciaController())->finalizar_registro_incidencia_glb($id_asociado, $usuario_creador, $tipo_asociado,
+        $obj = (new incidenciaController())->finalizar_registro_incidencia_glb($id_asociado, $usuario_creador, $tipo_asociado,
             function ($id_asociado, $usuario_creador, $count, $request) {
 
                 $cap_est_glb_0 = 'rep';
@@ -443,7 +449,7 @@ class fedatario_asistenteController extends Controller
 
                 if ($count > 0) {
                     //mandar captura a estado reproceso id_asociado = cc_id
-                    $fedatario_update = (new App\fedatario())->update_estado_fedatario($id_asociado, 1);
+                    $fedatario_update = (new fedatario())->update_estado_fedatario($id_asociado, 1);
                     $this->estado_captura_glb($captura_id, $cap_est_glb_0);
 
                     //grabamos log de captura
@@ -463,10 +469,10 @@ class fedatario_asistenteController extends Controller
                 } else {
 
 
-                    $fedatario_update = (new App\fedatario())->update_estado_fedatario($id_asociado, 2);
+                    $fedatario_update = (new fedatario())->update_estado_fedatario($id_asociado, 2);
 
                     //grabamos log de captura
-                    $log = new App\log();
+                    $log = new log();
                     $log->create_log_ez(
                                 $captura_id,//$log_captura_id  ,
                                 $id_asociado,//$log_id_asociado  ,
@@ -478,7 +484,7 @@ class fedatario_asistenteController extends Controller
                                 null//$log_archivo_id
                             );
 
-                    (new App\fedatario())->guardar_proyecto_grupo_fedatario_asistente($id_asociado,$usuario_creador);
+                    (new fedatario())->guardar_proyecto_grupo_fedatario_asistente($id_asociado,$usuario_creador);
                     //actualizar proyecto grupo a finalizado si terminó todo el grupo
                     //cambiar de estado los fedatarios NORMAL a estado 0 para que se activen
 
@@ -486,8 +492,7 @@ class fedatario_asistenteController extends Controller
                     // Actualizar control de calidad
 
                 }
-                return (new App\Http\Controllers\fedatario_asistenteController())
-                     ->retorna_autoasignacion_nueva_captura($proyecto_id,$recepcion_id,$captura_id,$usuario_creador);
+                return $this->retorna_autoasignacion_nueva_captura($proyecto_id,$recepcion_id,$captura_id,$usuario_creador);
                 //return "1";
 
             });
@@ -509,7 +514,7 @@ class fedatario_asistenteController extends Controller
         //cambiar de estado al grupo old
         //update grupo old a grupo actual
 
-        $data = (new App\fedatario())->arbol_fedatario_previo($proyecto_id,1);
+        $data = (new fedatario())->arbol_fedatario_previo($proyecto_id,1);
 
         $array_proyecto = array();
         $array_recepcion = array();

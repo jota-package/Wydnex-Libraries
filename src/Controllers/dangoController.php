@@ -6,6 +6,18 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use View;
 use Response;
+use App\captura;
+use App\plantilla;
+use App\proyecto;
+use App\indizacion;
+use App\elemento;
+use App\elemento_opciones;
+use App\combo;
+use App\simple;
+use App\respuesta;
+use App\opcion;
+use App\imagen;
+use App\incidencia_indizacion;
 use App;
 use DB;
 
@@ -23,7 +35,7 @@ Trait dangoController
         $usuario_id = session('usuario_id');
 
 
-        $cant = App\captura::where('captura_id', $captura_id)
+        $cant = captura::where('captura_id', $captura_id)
             ->whereNotNull('usuario_asignado_indizacion')
             ->Where('usuario_asignado_indizacion', '!=', $usuario_id)
             ->count();
@@ -36,7 +48,7 @@ Trait dangoController
         }
 
 
-        $captura = App\captura::where('captura_id', $captura_id)
+        $captura = captura::where('captura_id', $captura_id)
             ->update(['usuario_asignado_indizacion' => $usuario_id
             ]);
 
@@ -202,7 +214,7 @@ Trait dangoController
         $captura_id = request("captura_id");
         $indizacion_id = "1";//request("indizacion_id");
 
-        $plantilla = App\plantilla::
+        $plantilla = plantilla::
         select(
             "plantilla_id",
             "plantilla_nombre",
@@ -224,7 +236,7 @@ Trait dangoController
     public function lista_arbol_indizacion2()
     {
 
-        $data = App\proyecto::
+        $data = proyecto::
         select(
             "proyecto_nombre as text",
             "proyecto_id"
@@ -243,8 +255,7 @@ Trait dangoController
     public function lista_arbol_indizacion()
     {
 
-
-        $data = App\proyecto::
+        $data = proyecto::
         select(
             "proyecto_nombre as text",
             "proyecto_id"
@@ -254,8 +265,6 @@ Trait dangoController
             // ->where("cliente_id",1)
             ->get();
 
-
-        //  return $data;
         return self::verifyDirectoryTreeCliente($data);
 
 
@@ -264,8 +273,7 @@ Trait dangoController
     public function lista_arbol_captura()
     {
 
-
-        $data = App\proyecto::
+        $data = proyecto::
         select(
             "proyecto_nombre as text",
             "proyecto_id"
@@ -274,10 +282,7 @@ Trait dangoController
             // ->where("cliente_id",1)
             ->get();
 
-//        return $data;
-
         return self::verifyDirectoryTreeClienteCaptura($data);
-
 
     }
 
@@ -406,7 +411,7 @@ Trait dangoController
         $retorno = array();
         $prefijo_id = "captura_";
 
-        $is_indizacion = new App\indizacion();
+        $is_indizacion = new indizacion();
         foreach ($client as $i => $proyecto) {
 
             $proyecto_id = $proyecto["proyecto_id"];
@@ -630,7 +635,7 @@ Trait dangoController
     public function devolver_plantilla2()
     {
 
-        $data = App\plantilla::
+        $data = plantilla::
         select(
             "plantilla_nombre",
             "plantilla_id"
@@ -651,7 +656,7 @@ Trait dangoController
 
         $plantilla_id = "1";//request("plantilla_id");
 
-        $plantilla = App\plantilla::where("plantilla_id", $plantilla_id)
+        $plantilla = plantilla::where("plantilla_id", $plantilla_id)
             ->select(
                 "plantilla_id",
                 "plantilla_nombre"
@@ -661,7 +666,7 @@ Trait dangoController
             ->first();
 
 
-        $elemento = App\elemento::
+        $elemento = elemento::
         where("plantilla_id", $plantilla_id)
             ->select(
                 "elemento_id",
@@ -672,7 +677,7 @@ Trait dangoController
 
         foreach ($elemento as $key => $value) {
 
-            $elemento_opciones = App\elemento_opciones::
+            $elemento_opciones = elemento_opciones::
             where("elemento_id", $value->elemento_id)
                 ->select(
                     "elemento_opciones_incremental as eo_incremental",
@@ -686,10 +691,10 @@ Trait dangoController
 
             $value['elemento_opciones'] = $elemento_opciones;
 
-            $combo = App\combo::where("elemento_id", $value->elemento_id)
+            $combo = combo::where("elemento_id", $value->elemento_id)
                 ->first();
 
-            $simple = App\simple::where("elemento_id", $value->elemento_id)
+            $simple = simple::where("elemento_id", $value->elemento_id)
                 ->first();
 
             if ($simple != "" && $simple != null) {
@@ -710,7 +715,7 @@ Trait dangoController
 
             } else if ($combo != "" && $combo != null) {
 
-                $opciones = App\opcion::where("combo_id", $combo->combo_id)
+                $opciones = opcion::where("combo_id", $combo->combo_id)
                     ->select(
                         "plantilla_id",
                         "elemento_id",
@@ -840,7 +845,7 @@ Trait dangoController
 
 
                 /********Guardado del bloque de incidentes*****/
-                $is_imagen = new App\imagen();
+                $is_imagen = new imagen();
                 $obj_captura = $is_imagen->join("incidencia_imagen as i_i","i_i.imagen_id","imagen.imagen_id")
                     ->join("captura as cap","cap.captura_id","imagen.captura_id")
                     ->join("incidencia as in","in.incidencia_id","i_i.incidencia_id")
@@ -889,13 +894,13 @@ Trait dangoController
    public function guardar_indizacion($captura_id, $proyecto_id, $recepcion_id, $cliente_id, $indizacion_estado, $usuario_creador,$incidente_id)
     {
 
-        $inst_indizacion = new App\indizacion();
+        $inst_indizacion = new indizacion();
 
         $we = $inst_indizacion->crear_indizacion($captura_id, $proyecto_id, $recepcion_id, $cliente_id, $indizacion_estado, $usuario_creador);
 
         $array_respuesta = request('array_respuesta');
         foreach ($array_respuesta as $key => $elemento) {
-            $inst_respuesta = new App\respuesta();
+            $inst_respuesta = new respuesta();
 
             $opcion_id = $elemento['opcion_id'];
             $combo_id = $elemento['combo_id'];
@@ -909,7 +914,7 @@ Trait dangoController
 
         }
 
-        $is_incidencia_indizacion = new App\incidencia_indizacion();
+        $is_incidencia_indizacion = new incidencia_indizacion();
 
         $wo = $is_incidencia_indizacion->crear_incidencia_indizacion($indizacion_id, $incidente_id);
 

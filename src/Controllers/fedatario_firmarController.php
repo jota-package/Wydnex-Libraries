@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\fedatario_firmar;
+use App\recepcion;
 use App;
 use View;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +31,7 @@ class fedatario_firmarController extends Controller
     public function arbol_fedatario()
     {
 
-        $data = (new App\fedatario_firmar())->arbol_fedatario_firmar();
+        $data = (new fedatario_firmar())->arbol_fedatario_firmar();
 
         $array_proyecto = array();
         $array_recepcion = array();
@@ -59,20 +61,7 @@ class fedatario_firmarController extends Controller
                     $array_recepcion = array();
                 }
             }
-           /* $array_captura[] = [
-                "id" => $prefijo_id_captura . $fila->captura_id,
-                "text" => $fila->documento_nombre,
-                "id_captura" => $fila->captura_id,
-                "indizacion_id" => $fila->indizacion_id,
-                "cc_id" => $fila->cc_id,
-                "id_documento" => $fila->documento_id,
-                "adetalle_id" => $fila->adetalle_id,
-                "recepcion_tipo" => $fila->recepcion_tipo,
-                "cliente_id" => $fila->cliente_id,
-                "usuario_creador" => $fila->usuario_creador,
-                "proyecto_id" => $fila->proyecto_id,
-                "recepcion_id" => $fila->recepcion_id
-            ];*/
+      
             $recepcion_old = $fila->recepcion_id;
             $recepcion_tipo_old = $fila->recepcion_tipo;
             $recepcion_nombre_old = $fila->recepcion_nombre;
@@ -105,7 +94,7 @@ class fedatario_firmarController extends Controller
         $recepcion_id = request("recepcion_id");
         $captura_estado = request("captura_estado");
 
-        $recepcion_instancia = new App\recepcion();
+        $recepcion_instancia = new recepcion();
 
         $data = DB::select(
             "
@@ -285,25 +274,22 @@ class fedatario_firmarController extends Controller
         $array_check = request("array_check");
         $extension = request("extension");
         $out  = env('FOLDER_X_FIRMAR');
-        //$out =storage_path() . "/app/rayos/";
 
-        $is_inc_ima = new App\fedatario_firmar();
+        $is_inc_ima = new fedatario_firmar();
         $is_inc_ima -> iniciar_fedatario_firmar($array_check,3, $out);
 
     }
 
     public function validar_firmar_fed_fir(){
 
-        //$out =storage_path() . "/app/rayos/";
-
-        $is_inc_ima = new App\fedatario_firmar();
+        $is_inc_ima = new fedatario_firmar();
 
         $ids = request("array_check");
         $extension  = request("extension");
         $out = env('FOLDER_FIRMADO');
         $ruta = env('FOLDER_X_FIRMAR');
 
-        $is_inc_ima = new App\fedatario_firmar();
+        $is_inc_ima = new fedatario_firmar();
         return $is_inc_ima ->registrar_documentos($ids, $out, $ruta,".".$extension);
 
 
