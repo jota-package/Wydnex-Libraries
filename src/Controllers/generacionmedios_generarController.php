@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Fedatario\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\respuesta;
@@ -17,18 +17,9 @@ use App\generacion_medio_detalle_captura;
 use App\generacion_medio_detalle;
 use App\recepcion;
 
-
-
-class generacionmedios_generarController extends Controller
+Trait generacionmedios_generarController
 {
-    public function __construct()
-    {
-
-        $this->middleware('auth');
-        parent::__construct();
-
-    }
-
+    
     public function index()
     {
 

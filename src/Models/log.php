@@ -27,22 +27,22 @@ Trait log
         $log_archivo_id
     ){
 
-        $this->log_fecha_hora = $log_fecha_hora;
-        $this->log_usuario = $log_usuario;
-        $this->log_estado = $log_estado;
-        $this->log_ip = $log_ip;
-        $this->log_captura_id = $log_captura_id;
-        $this->log_id_asociado = $log_id_asociado;
-        $this->log_modulo_step_id = $log_modulo_step_id;
-        $this->log_tabla_asociada = $log_tabla_asociada;
-        $this->log_proceso = $log_proceso;
-        $this->log_descripcion = $log_descripcion;
-        $this->log_comentario = $log_comentario;
-        $this->log_archivo_id = $log_archivo_id;
+        $data = [
+            "log_fecha_hora" => $log_fecha_hora,
+            "log_usuario" => $log_usuario,
+            "log_estado" => $log_estado,
+            "log_ip" => $log_ip,
+            "log_captura_id" => $log_captura_id,
+            "log_id_asociado" => $log_id_asociado,
+            "log_modulo_step_id" => $log_modulo_step_id,
+            "log_tabla_asociada" => $log_tabla_asociada,
+            "log_proceso" => $log_proceso,
+            "log_descripcion" => $log_descripcion,
+            "log_comentario" => $log_comentario,
+            "log_archivo_id" => $log_archivo_id
+        ];
 
-        $save =  $this->save();
-
-        return $save;
+        return $this::create($data);
 
     }
 
@@ -57,22 +57,23 @@ Trait log
         $log_archivo_id = null
     ){
 
-        $this->log_fecha_hora = date('Y-m-d H:i:s');
-        $this->log_usuario = session("usuario_id");
-        $this->log_estado = 1;
-        $this->log_ip = Request::ip();
-        $this->log_captura_id = $log_captura_id;
-        $this->log_id_asociado = $log_id_asociado;
-        $this->log_modulo_step_id = $log_modulo_step_id;
-        $this->log_tabla_asociada = $log_tabla_asociada;
-        $this->log_proceso = $log_proceso;
-        $this->log_descripcion = $log_descripcion;
-        $this->log_comentario = $log_comentario;
-        $this->log_archivo_id = $log_archivo_id;
 
-        $save = $this->save();
+        $data = [
+            "log_fecha_hora" => date('Y-m-d H:i:s'),
+            "log_usuario" => session("usuario_id"),
+            "log_estado" => 1,
+            "log_ip" => Request::ip(),
+            "log_captura_id" => $log_captura_id,
+            "log_id_asociado" => $log_id_asociado,
+            "log_modulo_step_id" => $log_modulo_step_id,
+            "log_tabla_asociada" => $log_tabla_asociada,
+            "log_proceso" => $log_proceso,
+            "log_descripcion" => $log_descripcion,
+            "log_comentario" => $log_comentario,
+            "log_archivo_id" => $log_archivo_id
+        ];
 
-        return $save;
+        return $this::create($data);
     }
 
     public function reporte_x_captura($captura_id){

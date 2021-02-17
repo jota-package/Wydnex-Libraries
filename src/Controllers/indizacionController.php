@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Fedatario\Controllers;
 
 use DemeterChain\A;
 use Illuminate\Http\Request;
@@ -24,42 +24,8 @@ use App\control_calidad;
 use App\fedatario;
 
 
-class indizacionController extends Controller
+Trait indizacionController
 {
-
-    public function __construct()
-    {
-
-        $this->middleware('auth');
-        parent::__construct();
-
-    }
-
-    /* public function index()
-     {
-
-         $lotes = App\recepcion::
-         join("cliente as c", "c.cliente_id", "recepcion.cliente_id")
-             ->join("proyecto as p", "p.proyecto_id", "recepcion.proyecto_id")
-             ->select(
-                 "recepcion_id",
-                 "recepcion_tipo",
-                 "recepcion_nombre",
-                 "recepcion_estado",
-                 "recepcion.created_at",
-                 "cliente_nombre",
-                 "proyecto_nombre"
-
-             )
-             ->get();
-
-
-         return view::make('captura.index.content')
-             ->with("lotes", $lotes);
-
-
-     }*/
-
     public function index()
     {
 

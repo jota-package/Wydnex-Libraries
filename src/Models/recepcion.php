@@ -2,15 +2,12 @@
 
 namespace Fedatario\Models;
 
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
 use DB;
 
 Trait recepcion
 
 {
-    use Notifiable;
-
     protected $primaryKey = "recepcion_id";
     protected $table = "recepcion";
 

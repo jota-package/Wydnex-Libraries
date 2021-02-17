@@ -21,7 +21,6 @@ use App\incidencia_indizacion;
 use App;
 use DB;
 
-
 Trait dangoController
 {
     public function listar_plantilla()
@@ -928,13 +927,13 @@ Trait dangoController
             else a.captura_id end as captura_id_fake
             from captura a
             left join indizacion b on a.captura_id = b.captura_id and b.indizacion_estado=0
-			left join incidencia_indizacion c on c.indizacion_id = b.indizacion_id
-			left join incidencia d on d.incidencia_id = c.incidencia_id and d.incidencia_control = 0
+            left join incidencia_indizacion c on c.indizacion_id = b.indizacion_id
+            left join incidencia d on d.incidencia_id = c.incidencia_id and d.incidencia_control = 0
             left join indizacion bb on
             (b.captura_id = bb.captura_id or a.captura_id = bb.captura_id) and bb.indizacion_estado=1
             where (a.usuario_asignado_indizacion is null or a.usuario_asignado_indizacion=:user)
             and (bb.indizacion_estado is null)
-			and (d.incidencia_id is null)
+            and (d.incidencia_id is null)
             and a.captura_estado = 1
             order by proyecto_id,recepcion_id,captura_id_fake;'
             , ['recepcion_id' => $recepcion_id, 'captura_id'=> $captura_id,'proyecto_id' => $proyecto_id, 'user' => session("usuario_id")]);

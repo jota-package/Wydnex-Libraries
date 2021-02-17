@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Fedatario\Controllers;
 
 use Illuminate\Http\Request;
 use App\fedatario_firmar;
@@ -11,15 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 
-class fedatario_firmarController extends Controller
+Trait fedatario_firmarController
 {
-    public function __construct()
-    {
-
-        $this->middleware('auth');
-        parent::__construct();
-
-    }
 
     public function index()
     {

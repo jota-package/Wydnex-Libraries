@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Fedatario\Controllers;
 
 use Illuminate\Http\Request;
 use App;
@@ -16,16 +16,8 @@ use App\log;
 use App\Http\Controllers\incidenciaController;
 use App\Http\Controllers\tipo_calibradorController;
 
-class reporteController extends Controller
+Trait reporteController
 {
-
-    public function __construct()
-    {
-
-        $this->middleware('auth');
-        parent::__construct();
-
-    }
 
     public function index_user_proceso(){
 

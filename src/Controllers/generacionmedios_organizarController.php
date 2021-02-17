@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Fedatario\Controllers;
 
 use Illuminate\Http\Request;
 use View;
@@ -14,16 +14,9 @@ use App\generacion_medio_detalle;
 use App\generacion_medio;
 use App\generacion_medio_detalle_captura;
 
-class generacionmedios_organizarController extends Controller
+Trait generacionmedios_organizarController
 {
-    public function __construct()
-    {
-
-        $this->middleware('auth');
-        parent::__construct();
-
-    }
-
+    
     public function index()
     {
         $is_proyecto = new proyecto();
@@ -203,9 +196,9 @@ class generacionmedios_organizarController extends Controller
             esquery AS (
               select d.adetalle_id,
                   e.fedatario_firmar_estado,
-				  gmr.gm_id
+                  gmr.gm_id
               from recepcion a
-			  left join generacion_medio_recepcion gmr on gmr.recepcion_id = a.recepcion_id
+              left join generacion_medio_recepcion gmr on gmr.recepcion_id = a.recepcion_id
               left join captura b on a.recepcion_id = b.recepcion_id
               left join documento_imagen c on b.captura_id = c.captura_id
               left join adetalle d on d.adetalle_id = c.adetalle_id

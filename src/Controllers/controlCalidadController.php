@@ -18,14 +18,6 @@ use Illuminate\Support\Facades\DB;
 Trait controlCalidadController
 {
 
-    public function __construct()
-    {
-
-        $this->middleware('auth');
-        parent::__construct();
-
-    }
-
     public function index()
     {
 
@@ -637,8 +629,7 @@ Trait controlCalidadController
 
 
                 }
-                return $this()
-                    ->retorna_autoasignacion_nueva_captura($proyecto_id, $recepcion_id, $captura_id, $usuario_creador);
+                return $this->retorna_autoasignacion_nueva_captura($proyecto_id, $recepcion_id, $captura_id, $usuario_creador);
 
             });
 

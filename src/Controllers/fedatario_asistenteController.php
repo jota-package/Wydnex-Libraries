@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Fedatario\Controllers;
 
 use Illuminate\Http\Request;
 use App\proyecto;
@@ -13,16 +13,8 @@ use App;
 use View;
 use DB;
 
-class fedatario_asistenteController extends Controller
+Trait fedatario_asistenteController
 {
-
-    public function __construct()
-    {
-
-        $this->middleware('auth');
-        parent::__construct();
-
-    }
 
     public function index()
     {

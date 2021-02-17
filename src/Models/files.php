@@ -600,12 +600,12 @@ Trait files
                     p.proyecto_nombre
                 from recepcion r
                 join proyecto p
-                on r.proyecto_id = p.proyecto_id
+	            on r.proyecto_id = p.proyecto_id
                 where recepcion_id =   ANY(:recepcion_id::INT[])
                 --where recepcion_id =   ANY('{4,5}'::INT[])
                 union all
 
-                    select  a.file_id,
+                    select 	a.file_id,
                            a.file_nombre,
                            a.file_tipo,
                            --a.file_padre_id,
@@ -617,14 +617,14 @@ Trait files
                                 as file_padre_id
                            ,
                            b.nivel+1 as nivel,
-                            --row_number() over(order by a.file_tipo)   ,
-                            --row_number() over(partition by a.file_padre_id order by a.file_padre_id )-1   as posicion,
+                            --row_number() over(order by a.file_tipo)	,
+                            --row_number() over(partition by a.file_padre_id order by a.file_padre_id )-1	as posicion,
                             posicion||row_number() over(partition by
-                                                        case
-                                                            when a.file_padre_id is null
-                                                                then a.recepcion_id*-1
-                                                                else a.file_padre_id
-                                                            end
+														case
+															when a.file_padre_id is null
+																then a.recepcion_id*-1
+																else a.file_padre_id
+															end
                                                         --order by a.file_padre_id)-1 as posicion,
                                                         order by a.file_id)-1 as posicion,
                             a.recepcion_id,
@@ -762,7 +762,7 @@ Trait files
 
                 union all
 
-                select  a.file_id,
+                select 	a.file_id,
                 a.file_nombre,
                 a.file_tipo,
                 --a.file_padre_id,
@@ -776,8 +776,8 @@ Trait files
                         as file_padre_id
                 ,
                 b.nivel+1 as nivel,
-                    --row_number() over(order by a.file_tipo)   ,
-                    --row_number() over(partition by a.file_padre_id order by a.file_padre_id )-1   as posicion,
+                    --row_number() over(order by a.file_tipo)	,
+                    --row_number() over(partition by a.file_padre_id order by a.file_padre_id )-1	as posicion,
                     posicion||row_number() over(partition by
                                                 case
                                                     when a.file_padre_id is null and a.file_captura_estado=1
@@ -970,9 +970,9 @@ Trait files
                        left join  respuesta res
                        on res.indizacion_id = ind.indizacion_id
                        left join elemento e
-                       on e.elemento_id = res.elemento_id
+		               on e.elemento_id = res.elemento_id
                        left join simple s
-                       on s.elemento_id = res.elemento_id
+		               on s.elemento_id = res.elemento_id
                 ),
                 datos2 as (
                    select distinct
@@ -1002,7 +1002,7 @@ Trait files
                        on  ca.captura_id = im.captura_id
                 )
                 select
-                       file_nombre,
+				       file_nombre,
                        proyecto_id,
                        recepcion_id,
                        'visor/database/recepcion_'||(recepcion_id::varchar(10))||'.json' as file_data,
@@ -1013,11 +1013,11 @@ Trait files
                        captura_estado,
                        documento_id,
                        plantilla_nombre,
-                       items,
-                       adetalle_nombre,
-                       file_name,
-                       adetalle_peso,
-                       children,
+					   items,
+					   adetalle_nombre,
+					   file_name,
+					   adetalle_peso,
+					   children,
                 case
                     when ruta = '[null]'::jsonb
                         then '[]'::jsonb
@@ -1044,7 +1044,7 @@ Trait files
                 ,f.file_tipo
                 --,f.file_padre_id
                 ,case when f.file_captura_estado != 1 then f.recepcion_id*-1000
-                else f.file_padre_id end as file_padre_id
+	            else f.file_padre_id end as file_padre_id
                 ,f.file_captura_estado
                 ,f.file_estado
                 ,f.file_usuario_id
@@ -1198,7 +1198,7 @@ Trait files
                     left join simple s
                     on s.elemento_id = res.elemento_id
                     left join opcion o
-                    on o.opcion_id = res.opcion_id
+		            on o.opcion_id = res.opcion_id
             ),
             datos as(
                 select distinct
@@ -1440,14 +1440,14 @@ Trait files
                     'simple_tipo_dato', s.simple_tipo_dato,
                     'simple_tipo_formato', s.simple_tipo_formato,
                     'elemento_nombre', e.elemento_nombre,
-                    'opcion',
-                    CASE
-                          WHEN c.combo_id is null THEN null
-                          ELSE  (select jsonb_agg(json_build_object(
-                                'opcion_nombre',comop.opcion_nombre,
-                                'opcion_id',comop.opcion_id))
-                                from combo_opciones as comop)
-                          END
+					'opcion',
+					CASE
+						  WHEN c.combo_id is null THEN null
+						  ELSE  (select jsonb_agg(json_build_object(
+								'opcion_nombre',comop.opcion_nombre,
+								'opcion_id',comop.opcion_id))
+								from combo_opciones as comop)
+						  END
                 )
             )
             over (partition by a.plantilla_id) AS items
@@ -1480,8 +1480,8 @@ Trait files
          $files = DB::select(
              DB::raw("
              select distinct
-            cap.captura_id,
-            json_build_object(
+			cap.captura_id,
+			json_build_object(
                 'ocr_contenido', ocr.ocr_contenido,
                 'ocr_pagina', ocr.ocr_pagina,
                 'ocr_total_paginas', ocr.ocr_total_paginas
@@ -1495,9 +1495,9 @@ Trait files
             join proyecto a
                 on a.proyecto_id = r.proyecto_id
             left join captura cap
-                on cap.recepcion_id = r.recepcion_id
-            left join ocr
-                on ocr. captura_id = cap.captura_id
+				on cap.recepcion_id = r.recepcion_id
+			left join ocr
+				on ocr. captura_id = cap.captura_id
             where gmd.gmd_id = :gmd_id;
              "),
              ["gmd_id" => $gmd_id]
@@ -1653,7 +1653,7 @@ Trait files
 
                 union all
 
-                select  a.file_id,
+                select 	a.file_id,
                 a.file_nombre,
                 a.file_tipo,
                 --a.file_padre_id,
@@ -1667,8 +1667,8 @@ Trait files
                         as file_padre_id
                 ,
                 b.nivel+1 as nivel,
-                    --row_number() over(order by a.file_tipo)   ,
-                    --row_number() over(partition by a.file_padre_id order by a.file_padre_id )-1   as posicion,
+                    --row_number() over(order by a.file_tipo)	,
+                    --row_number() over(partition by a.file_padre_id order by a.file_padre_id )-1	as posicion,
                     posicion||row_number() over(partition by
                                                 case
                                                     when a.file_padre_id is null and a.file_captura_estado=1
@@ -2149,7 +2149,7 @@ Trait files
 
                 union all
 
-                select  a.file_id,
+                select 	a.file_id,
                 a.file_nombre,
                 a.file_tipo,
                 --a.file_padre_id,
@@ -2163,8 +2163,8 @@ Trait files
                         as file_padre_id
                 ,
                 b.nivel+1 as nivel,
-                    --row_number() over(order by a.file_tipo)   ,
-                    --row_number() over(partition by a.file_padre_id order by a.file_padre_id )-1   as posicion,
+                    --row_number() over(order by a.file_tipo)	,
+                    --row_number() over(partition by a.file_padre_id order by a.file_padre_id )-1	as posicion,
                     posicion||row_number() over(partition by
                                                 case
                                                     when a.file_padre_id is null and a.file_captura_estado=1
