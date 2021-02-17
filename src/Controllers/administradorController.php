@@ -5,7 +5,12 @@ namespace Fedatario\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\respuesta;
 use App\Http\Controllers\utils;
-use App;
+use App\Http\Controllers\incidenciaController;
+use App\Http\Controllers\tipo_calibradorController;
+use App\captura;
+use App\documento;
+use App\equipo;
+use App\files;
 use View;
 use DB;
 use Response;
@@ -16,41 +21,41 @@ Trait administradorController
     public function index(){
 
         //Instancia Documento
-        $ins_documento = new App\documento();
+        $ins_documento = new documento();
         //Instancia Incidencia
-        $ins_incidencia = new App\Http\Controllers\incidenciaController();
-        $ins_tipo_calibrador = new App\Http\Controllers\tipo_calibradorController();
+        $ins_incidencia = new incidenciaController();
+        $ins_tipo_calibrador = new tipo_calibradorController();
 
-        $equipo = App\equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
+        $equipo = equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
             ->select('p.persona_nombre','p.persona_apellido','equipo.usuario_id')
             ->distinct()
             ->get();
 
-        $equipo_captura = App\equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
+        $equipo_captura = equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
             ->select('p.persona_nombre','p.persona_apellido','equipo.usuario_id')
             ->distinct()
             ->where('equipo.perfil_id',2)
             ->get();
 
-        $equipo_indizacion = App\equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
+        $equipo_indizacion = equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
             ->select('p.persona_nombre','p.persona_apellido','equipo.usuario_id','equipo.perfil_id')
             ->distinct()
             ->where('equipo.perfil_id',3)
             ->get();
 
-        $equipo_control_calidad = App\equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
+        $equipo_control_calidad = equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
             ->select('p.persona_nombre','p.persona_apellido','equipo.usuario_id','equipo.perfil_id')
             ->distinct()
             ->where('equipo.perfil_id',4)
             ->get();
 
-        $equipo_fedatario = App\equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
+        $equipo_fedatario = equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
             ->select('p.persona_nombre','p.persona_apellido','equipo.usuario_id')
             ->distinct()
             ->where('equipo.perfil_id',5)
             ->get();
 
-        $equipo_reproceso = App\equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
+        $equipo_reproceso = equipo::join('persona as p','p.usuario_id','equipo.usuario_id')
             ->select('p.persona_nombre','p.persona_apellido','equipo.usuario_id')
             ->distinct()
             ->get();
@@ -77,7 +82,7 @@ Trait administradorController
 
         $documento_id = request("documento_id");
 
-        $is_captura = new App\captura();
+        $is_captura = new captura();
         $array_total = $is_captura->mantenimiento($documento_id);
 
         return $array_total;
@@ -118,7 +123,7 @@ Trait administradorController
         $usuario_reproceso = request('usuario_reproceso');
         $usuario_reproceso = (is_null ( $usuario_reproceso )) ? 0 : $usuario_reproceso;
 
-        $is_captura = new App\captura();
+        $is_captura = new captura();
         $ok_update_captura = $is_captura-> super_squery_upd_mantenimiento(
             $captura_id
             ,$estado_captura
@@ -152,7 +157,7 @@ Trait administradorController
         $estado_fed_firmar = request('estado_fed_firmar');
         $estado_gen_generar  = request('estado_generar');
 
-        $is_captura = new App\captura();
+        $is_captura = new captura();
         $change_validador = $is_captura -> modulo_cambio_flujo(
             $estado_captura,
             $estado_indizacion,
@@ -164,7 +169,6 @@ Trait administradorController
 
         return $change_validador;
 
-
     }
 
     public function obtener_indices(Request $request){
@@ -172,15 +176,12 @@ Trait administradorController
         if(count($lista_capturas) == 0){
             return respuesta::error("No se ha recibido ningun indices.");
         }
-
         $lista_query = "{".implode(",", $lista_capturas)."}";
-
-        return App\captura::obtener_indices_capturas($lista_query);
-        // return respuesta::ok($lista_query);
+        return captura::obtener_indices_capturas($lista_query);
     }
 
     public function borrar_captura(Request $request){
         $file_id = $request->input("file_id", 0);
-        return App\files::borrar_file_contenido($file_id);
+        return files::borrar_file_contenido($file_id);
     }
 }

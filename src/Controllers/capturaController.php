@@ -8,7 +8,24 @@ use Carbon\Carbon;
 use View;
 use Response;
 use App;
+use App\documento;
+use App\captura;
+use App\control_calidad;
+use App\recepcion;
+use App\proyecto;
+use App\adetalle;
+use App\files;
+use App\log;
+use App\indizacion;
+use App\ocr;
+use App\fedatario;
+use App\fedatario_firmar;
+use App\proyecto_captura_flujo;
 use App\Http\Controllers\respuesta;
+use App\Http\Controllers\incidenciaController;
+use App\Http\Controllers\tipo_calibradorController;
+use App\Http\Controllers\capturafileController;
+use App\Http\Controllers\OCRController;
 use DB;
 use DateTime;
 
@@ -19,15 +36,14 @@ Trait capturaController
     {
 
         //Instancia Documento
-        $ins_documento = new App\documento();
+        $ins_documento = new documento();
         //Instancia Incidencia
-        $ins_incidencia = new App\Http\Controllers\incidenciaController();
-        $ins_tipo_calibrador = new App\Http\Controllers\tipo_calibradorController();
+        $ins_incidencia = new incidenciaController();
+        $ins_tipo_calibrador = new tipo_calibradorController();
 
         $lista_documentos = $ins_documento->listar_documento();
         $incidencia = $ins_incidencia->listar_incidencia();
         $tipo_calibrador = $ins_tipo_calibrador->listar_tipo_calibrador();
-
 
         return view::make('captura.index.content')
             ->with("lotes", $lista_documentos)
@@ -41,7 +57,7 @@ Trait capturaController
 
         $documento_id = request("documento_id");
         //Instancia Documento
-        $ins_documento = new App\documento();
+        $ins_documento = new documento();
         return $lista_url_imagenes = $ins_documento->listar_url($documento_id);
 
     }
@@ -56,7 +72,7 @@ Trait capturaController
 
         if ($captura_estado == 1) {
 
-            $captura_validacion = new App\captura();
+            $captura_validacion = new captura();
 
             $acta = $captura_validacion::where("recepcion_id", $recepcion_id)
                 ->where("captura_estado", 2)
@@ -93,8 +109,7 @@ Trait capturaController
 
         if ($captura_estado == 2) {
 
-            $captura_validacion = new App\captura();
-
+            $captura_validacion = new captura();
 
             $tarjeta = $captura_validacion::where("recepcion_id", $recepcion_id)
                 ->where("captura_estado", 3)
@@ -123,7 +138,7 @@ Trait capturaController
             }
         }
 
-        $recepcion_instancia = new App\recepcion();
+        $recepcion_instancia = new recepcion();
 
         $data = DB::select(
             "select * from recepcion a
@@ -150,7 +165,7 @@ Trait capturaController
 
         if ($captura_estado == 1) {
 
-            $captura_validacion = new App\captura();
+            $captura_validacion = new captura();
 
             $acta = $captura_validacion::where("recepcion_id", $recepcion_id)
                 ->where("captura_estado", 2)
@@ -180,7 +195,7 @@ Trait capturaController
 
         if ($captura_estado == 2) {
 
-            $captura_validacion = new App\captura();
+            $captura_validacion = new captura();
             $tarjeta = $captura_validacion::where("recepcion_id", $recepcion_id)
                 ->where("captura_estado", 3)
                 ->whereBetween("created_at", [$today, $tomorrow])
@@ -211,13 +226,13 @@ Trait capturaController
 
         $recepcion_id = request("recepcion_actual");
 
-        $recepcion = App\recepcion::where("recepcion_id", $recepcion_id)
+        $recepcion = recepcion::where("recepcion_id", $recepcion_id)
             ->first();
 
-        $proyectos = App\proyecto::where("cliente_id", $recepcion->cliente_id)
+        $proyectos = proyecto::where("cliente_id", $recepcion->cliente_id)
             ->first();
 
-        $documentos = App\documento::where("recepcion_id", $recepcion_id)
+        $documentos = documento::where("recepcion_id", $recepcion_id)
             ->get();
 
         $recepcion['documentos'] = $documentos;
@@ -242,11 +257,11 @@ Trait capturaController
         $recepcion_id = request('recepcion_id');
         // $obj_captura = json_decode($captura, true);
 
-        $inst_recepcion = new App\recepcion();
+        $inst_recepcion = new recepcion();
         $recepcion_valores = $inst_recepcion->where("recepcion_id", $recepcion_id)->first();
 
 
-        $inst_captura = new App\captura();
+        $inst_captura = new captura();
         $array_limpiar = [];
         $array = [];
 
@@ -255,7 +270,7 @@ Trait capturaController
 
             foreach ($captura as $key => $value) {
 
-                $documento_valores = new App\documento();
+                $documento_valores = new documento();
                 $valor_documento = $documento_valores->where("documento_id", $value['documento_id'])->first();
 
 
@@ -283,9 +298,9 @@ Trait capturaController
             $contador_array = count($array);
 
             if ($contador_array !== 0) {
-                $captura = new App\captura();
+                $captura = new captura();
                 $captura->where('recepcion_id', $recepcion_id)->delete();
-                $documento = new App\documento();
+                $documento = new documento();
                 $documento->where('recepcion_id', $recepcion_id)->delete();
 
                 $captura->crear_lista_captura($array, false);
@@ -307,18 +322,16 @@ Trait capturaController
 
             foreach ($captura as $key => $value) {
 
-                $documento_valores = new App\documento();
+                $documento_valores = new documento();
                 $documento_valores->editar_documento_adetalle($value['documento_id'], $value['adetalle_id']);
             }
 
         }
 
-
         $tipo = 'ok';
         $mensaje = 'Registro de plantilla correcto';
 
         return Controller::crear_objeto($tipo, $mensaje);
-
 
     }
 
@@ -326,7 +339,7 @@ Trait capturaController
     {
 
         $recepcion_id = request('recepcion_actual');
-        $inst_captura = new App\captura();
+        $inst_captura = new captura();
         $captura_lista = $inst_captura->listar_captura($recepcion_id);
 
         return $captura_lista;
@@ -347,22 +360,22 @@ Trait capturaController
 
         $ida = $idadetalle;
 
-        $documento_instancia = new App\documento();
+        $documento_instancia = new documento();
         $documento_valor = $documento_instancia->where('adetalle_id', $ida)->first();
         $validador = $documento_instancia->join("recepcion as re", "re.recepcion_id", "documento.recepcion_id")->where("adetalle_id", $ida)->first();
-        $captura_valor = App\captura::where('captura_id', $documento_valor['captura_id'])->first();
+        $captura_valor = captura::where('captura_id', $documento_valor['captura_id'])->first();
 
-        App\adetalle::where('adetalle_id', $ida)->delete();
+        adetalle::where('adetalle_id', $ida)->delete();
 
-        $f = new App\files();
+        $f = new files();
 
         if ($validador['recepcion_tipo'] === "m") {
-            App\documento::where('documento_id', $documento_valor['documento_id'])->delete();
-            App\captura::where('captura_id', $documento_valor['captura_id'])->delete();
+            documento::where('documento_id', $documento_valor['documento_id'])->delete();
+            captura::where('captura_id', $documento_valor['captura_id'])->delete();
             $f->borrar_archivo($captura_valor["captura_file_id"]);
         } elseif ($captura_valor['captura_estado'] != 1) {
-            App\documento::where('documento_id', $documento_valor['documento_id'])->delete();
-            App\captura::where('captura_id', $documento_valor['captura_id'])->delete();
+            documento::where('documento_id', $documento_valor['documento_id'])->delete();
+            captura::where('captura_id', $documento_valor['captura_id'])->delete();
             $f->borrar_archivo($captura_valor["captura_file_id"]);
         }
 
@@ -386,7 +399,7 @@ Trait capturaController
         $resultado_borrar = self::borrar_archivo_captura_impl($idadetalle);
 
         //3.-inserto el nuevo archivo
-        $capturaFileController = new App\Http\Controllers\capturafileController();
+        $capturaFileController = new capturafileController();
         if (!empty($fileTiff)) {
             $adetalle_id_nuevo = $capturaFileController->registrar_archivo_multiple($request, "", $fileTiff);
         } else {
@@ -429,7 +442,7 @@ Trait capturaController
         // $captura_id = "13";//request("captura_id");
         //En caso de que captura sea múltiple obtiene el id de captura a través del adetalle_id
         if ($recepcion_tipo === "m") {
-            $is_captura = (new App\adetalle())
+            $is_captura = (new adetalle())
                 ->join("documento as doc", "doc.adetalle_id", "adetalle.adetalle_id")
                 ->where("doc.adetalle_id", $captura_id)
                 ->select("documento_id")->first();
@@ -441,7 +454,7 @@ Trait capturaController
         $id_asociado = $captura_id;
 
         //Enviado a la funcion global de incidencia
-        (new App\Http\Controllers\incidenciaController())->finalizar_registro_incidencia_glb($id_asociado, $usuario_creador, $tipo_asociado,
+        (new incidenciaController())->finalizar_registro_incidencia_glb($id_asociado, $usuario_creador, $tipo_asociado,
             //funcion que se ejecutará dentro de finalizar_registro_incidencia_glb pero al final
             function ($id_asociado, $usuario_creador, $count, $request) {
                 $cap_est_glb_0 = 'rep';
@@ -449,7 +462,7 @@ Trait capturaController
 
                 if ($count > 0) {
                     //grabamos log de captura
-                    $log = new App\log();
+                    $log = new log();
                     $log->create_log_ez(
                         $id_asociado,//$log_captura_id  ,
                         $id_asociado,//$log_id_asociado  ,
@@ -469,7 +482,7 @@ Trait capturaController
                     $this->registrar_avance_flujo_from_captura_to($id_asociado, $usuario_creador);
 
                     //grabamos log de captura
-                    $log = new App\log();
+                    $log = new log();
                     $log->create_log_ez(
                         $id_asociado,//$log_captura_id  ,
                         $id_asociado,//$log_id_asociado  ,
@@ -506,7 +519,7 @@ Trait capturaController
                         //Concatenamos la ruta completa
                         $ruta =storage_path() . '/app/'.$path ;
                         //Enviamos la ruta al WS de OCR
-                        $is_OCR = new App\Http\Controllers\OCRController();
+                        $is_OCR = new OCRController();
                         $ws_OCR = $is_OCR->path_file_ws_ocr($ruta);
                         
                         if(!$ws_OCR["estado"]){
@@ -567,7 +580,6 @@ Trait capturaController
     public function guardar_paginas($ws_OCR,$id_asociado,$usuario_creador)
     {
 
-        //$ws_OCR = 'C:\Users\Memory\Documents\Temporal\prueba2.txt';
         $texto_glb = '';
         $arr_pagina = [];
         $now = date('Y-m-d H:i:s');
@@ -597,7 +609,7 @@ Trait capturaController
             $ocr_pagina = $key + 1;
             $ocr_total_paginas = count($arr_pagina);
 
-            $is_OCR_model = new App\ocr();
+            $is_OCR_model = new ocr();
             $OCR_save = $is_OCR_model->crear_ocr($imagen_id, $captura_id,
                 $ocr_contenido, $ocr_estado,
                 $ocr_usuario_id, $ocr_fecha,
@@ -621,7 +633,7 @@ Trait capturaController
      */
     function registrar_avance_flujo_from_captura_to($captura_id, $usuario_creador)
     {
-        $pro_cap_flujo = (new App\proyecto_captura_flujo())->consultar_orden($captura_id);
+        $pro_cap_flujo = (new proyecto_captura_flujo())->consultar_orden($captura_id);
         $modulo_step_id = 0;
         if (count($pro_cap_flujo) > 0) {
             $modulo_step_id = $pro_cap_flujo[0]->modulo_step_id;
@@ -637,24 +649,24 @@ Trait capturaController
                     //pasa a indizacion
 
                     //crear registro inicial de indizacion
-                    $id_generado_nuevo_modulo = (new App\indizacion())->crear_indizacion_inicial_from_captura($captura_id,$usuario_creador);
+                    $id_generado_nuevo_modulo = (new indizacion())->crear_indizacion_inicial_from_captura($captura_id,$usuario_creador);
                     break;
                 case 3:
                     //pasa a control calidad
 
                     //crear registro inicial de control de calidad
-                    $id_generado_nuevo_modulo = (new App\control_calidad())->crear_control_calidad_inicial_from_captura($captura_id, $usuario_creador);
+                    $id_generado_nuevo_modulo = (new control_calidad())->crear_control_calidad_inicial_from_captura($captura_id, $usuario_creador);
                     // (new App\indizacion())->estado_indizacion_glb($id_asociado, $indizacion_estado_finalizado);
                     // $this->estado_captura_glb($id_asociado, $cap_est_glb_1);
 
                     break;
                 case 4:
                     //pasa a fedatario revisar
-                    $id_generado_nuevo_modulo = (new App\fedatario())->crear_fedatario_inicial_from_captura($captura_id, $usuario_creador);
+                    $id_generado_nuevo_modulo = (new fedatario())->crear_fedatario_inicial_from_captura($captura_id, $usuario_creador);
                     break;
                 case 5:
                     //pasa a fedatario firmar
-                    $id_generado_nuevo_modulo = (new App\fedatario_firmar())->crear_fedatario_firmar_inicial_from_captura($captura_id, $usuario_creador);
+                    $id_generado_nuevo_modulo = (new fedatario_firmar())->crear_fedatario_firmar_inicial_from_captura($captura_id, $usuario_creador);
                     break;
 
                 default:
@@ -725,7 +737,7 @@ Trait capturaController
 
 
             //Enviamos la ruta al WS de OCR
-            $is_OCR = new App\Http\Controllers\OCRController();
+            $is_OCR = new OCRController();
             $ws_OCR = $is_OCR->path_file_ws_ocr($ruta);
 
             var_dump($cont.".......OK");
@@ -753,10 +765,6 @@ Trait capturaController
     }
 
     public function prueba_ocr_docs(){
-
-
-
-
 
         $path = storage_path() . "/app/documentos/";
         $path_documentos = "documentos/";
