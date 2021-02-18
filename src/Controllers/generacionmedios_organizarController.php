@@ -3,6 +3,7 @@
 namespace Fedatario\Controllers;
 
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use View;
 use App;
 use DB;
@@ -36,7 +37,8 @@ Trait generacionmedios_organizarController
     public function proyecto_ver_recepcion(Request $request)
     {
 
-        $proyecto_id = $request->input("proyecto_id",0);
+        // $proyecto_id = $request->input("proyecto_id",0);
+        $proyecto_id = request("proyecto_id");
 
         $recepcion_x_proyecto = DB::select("select
                                                 distinct on (b.recepcion_id) b.recepcion_id,

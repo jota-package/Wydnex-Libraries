@@ -537,6 +537,7 @@ Trait capturaController
                         }
 
                         $ws_OCR = $ws_OCR["payload"];
+                        $comentario = (isset($ws_OCR["payload"]["Error"]))? $ws_OCR["payload"]["Error"] : "";
                         if(!$ws_OCR["estado"]){
                             $log->create_log_ez(
                                 $id_asociado,//$log_captura_id  ,
@@ -545,7 +546,7 @@ Trait capturaController
                                 'ocr',//$log_tabla_asociada  ,
                                 'OCR-ERROR',//$log_proceso  ,
                                 $ws_OCR["mensaje"],//$log_descripcion  ,
-                                '',//$log_comentario  ,
+                                $comentario,//$log_comentario  ,
                                 null//$log_archivo_id
                             );
                             return dd($ws_OCR);
